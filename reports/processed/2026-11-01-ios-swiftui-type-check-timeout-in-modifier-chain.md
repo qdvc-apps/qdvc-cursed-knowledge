@@ -1,3 +1,5 @@
+> **Outcome (2026-11-20):** New entry on the type-check timeout from literal arithmetic in a modifier chain, in Swift, SwiftUI and UIKit (iOS and iPadOS). The related macOS `private(set)` entry now links to it.
+
 # SwiftUI: "unable to type-check this expression in reasonable time" from literal arithmetic inside a modifier chain
 
 - **Date encountered:** 2026-11 (month only)

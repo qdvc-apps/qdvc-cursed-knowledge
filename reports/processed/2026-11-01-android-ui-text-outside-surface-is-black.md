@@ -1,3 +1,5 @@
+> **Outcome (2026-11-20):** New entry "Compose `Text` outside a `Surface` is black, even in dark mode" in Kotlin, Jetpack Compose and Android UI.
+
 # Compose `Text` outside a `Surface` or `Scaffold` is black, even in dark mode
 
 - **Date encountered:** 2026-11 (month only)

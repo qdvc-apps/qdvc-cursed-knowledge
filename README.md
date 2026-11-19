@@ -33,7 +33,7 @@ A word of caution: most of these diagnoses were made by an AI assistant that usu
 - [Android build tooling: Gradle and Kotlin](#android-build-tooling-gradle-and-kotlin)
 - [Windows, .NET and WinForms](#windows-net-and-winforms)
 - [Web: HTML, CSS, SVG, JavaScript and Plotly](#web-html-css-svg-javascript-and-plotly)
-- [Other libraries: llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib](#other-libraries-llamacpp-textual-weasyprint-werkzeug-matplotlib)
+- [Other libraries and services](#other-libraries-and-services): llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib, Immich
 - [File formats and standards](#file-formats-and-standards)
 - [Mistakes the AI kept repeating](#mistakes-the-ai-kept-repeating)
 - [Sources](#sources)
@@ -585,7 +585,7 @@ fatal: Need to specify how to reconcile divergent branches.
 
 **Cause:** Swift's `private` is file-scoped, so an extension of the same class in `AppModel+Coding.swift` can't use a `private(set)` setter declared in `AppModel.swift`. Separately, a long chain of tuple-returning closures (rank, sort, map in one expression) was too much for the type checker.
 
-**Fix:** Use `internal` (plain `var`) or `fileprivate` deliberately. Split long closure chains into explicitly typed steps.
+**Fix:** Use `internal` (plain `var`) or `fileprivate` deliberately. Split long closure chains into explicitly typed steps. The same timeout also comes from [literal arithmetic in SwiftUI modifier chains](#unable-to-type-check-this-expression-in-reasonable-time-from-literal-arithmetic-in-a-modifier-chain).
 
 ### Your type names can clash with SwiftUI's
 
@@ -720,6 +720,18 @@ Non-public QDVC project (2026-11-15) · [report](reports/processed/2026-11-15-ne
 **Fix:** Create an `AVCaptureDevice.RotationCoordinator(device:previewLayer:)` (iOS 17 and later), observe its `videoRotationAngleForHorizonLevelPreview` with key-value observation, and set the preview connection's `videoRotationAngle` to it after checking `isVideoRotationAngleSupported`. Apply it at setup, in `viewDidLayoutSubviews` and in `viewWillTransition(to:with:)`, and keep the layer's `frame` equal to the view's bounds on every layout. (Not confirmed.)
 
 **Watch for:** Testing only on an iPhone in portrait hides this completely; iPad apps are never portrait-only. The same applies to any custom camera view, such as document scanning or video capture. Code samples that set `videoOrientation` predate the rotation coordinator; they still compile, with a deprecation warning.
+
+### "Unable to type-check this expression in reasonable time" from literal arithmetic in a modifier chain
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-ios-swiftui-type-check-timeout-in-modifier-chain.md)
+
+**Symptom:** A short SwiftUI modifier chain failed to build with `The compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions`, reported against the whole statement. The chain included `.opacity(Double(max(0, (1 - progress * 2) * (1 - fraction * 4))))`, `.allowsHitTesting(isVisible && progress == 0 && offset == 0)` and `.opacity(isVisible ? 1 : 0)`, with `CGFloat` state driven by a drag gesture.
+
+**Cause:** A modifier chain is a single expression, so the type checker solves it all at once. Every untyped literal could be any numeric type, `max` is generic, `Double(…)` has many overloads, and Swift converts implicitly between `CGFloat` and `Double`, which multiplies the combinations. (Best explanation; not measured.)
+
+**Fix:** Work out each value first as a separate constant with an explicit type (`let fade: CGFloat = …`, `let overlayOpacity: Double = …`, `let interactive: Bool = …`), then use the constants in the chain. Plain `let`s are allowed inside a `ViewBuilder`. Confirmed: the next build got past it. Three similar expressions in other files were split up pre-emptively.
+
+**Watch for:** Gesture-driven views, with literal arithmetic on `CGFloat` state directly inside `.opacity`, `.offset`, `.scaleEffect`, `.frame` or `.rotationEffect`. Wrapping the expression in `Double(…)` or `CGFloat(…)` makes it worse; give the intermediate value a type instead. The compiler stops at the first file that times out, so search the other view files for the same shape. See also the [macOS entry on long closure chains](#privateset-doesnt-reach-an-extension-in-another-file).
 
 ## Kotlin, Jetpack Compose and Android UI
 
@@ -923,6 +935,42 @@ Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-an
 
 **Watch for:** The message looks like a type problem but is a missing import. Check every file with `by remember`, `by mutableStateOf`, `by produceState`, `by animate…AsState` or `by rememberUpdatedState`; one `getValue` import covers all the overloads.
 
+### A Media3 `PlayerView` in Compose plays sound but no picture
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-android-ui-surfaceview-video-hidden-under-compose.md)
+
+**Symptom:** A short video was meant to replace a still image (its poster frame) while the user held a finger on it. The sound played, but the picture never appeared and the still stayed on screen. The video was a Media3 `PlayerView` hosted through `AndroidView`, in the same `Box` as the still, inside a zoomable area using `graphicsLayer`.
+
+**Cause:** `PlayerView` renders into a `SurfaceView` by default. A `SurfaceView`'s surface is a separate layer composited behind the app's window, shown through a transparent hole the view punches in it, so anything the window draws over that area (here, the still) hides the video. It also doesn't follow Compose's draw order, alpha, clipping or `graphicsLayer` transforms. The player was running normally; its frames just went to a surface nobody could see. (Best explanation: the fix changed two things at once.)
+
+**Fix:** Render into a `TextureView` instead (`factory = { TextureView(it).also { player.setVideoTextureView(it) } }`, with `player.clearVideoSurface()` on dispose), placed in front of the still and sized to the video's aspect ratio from `onVideoSizeChanged`. Moving the video in front of the still may have been enough on its own. `PlayerView` also accepts `app:surface_type="texture_view"`, but only from XML, and newer Media3 releases have a `PlayerSurface` composable in `media3-ui-compose` with a texture-view option. (Not confirmed.)
+
+**Watch for:** Any `SurfaceView` hosted in Compose with content over it, or inside a pager, zoom container or animated transition: video players, camera previews (CameraX `PreviewView`'s default performance mode uses one), maps. Sound with no picture, or a picture that stays put while the screen animates, points to layering rather than decoding. For a plain full-screen video with nothing over it, `SurfaceView` is still the better choice, since `TextureView` costs a little more power and latency.
+
+### Compose `Text` outside a `Surface` is black, even in dark mode
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-android-ui-text-outside-surface-is-black.md)
+
+**Symptom:** In dark mode, some lines in a full-screen overlay's details panel were black on the dark background and almost invisible; others in the same panel were fine. The black lines were plain `Text(…)` calls with no colour. Light mode looked correct.
+
+**Cause:** Material 3's `Text` takes its colour from `color`, then the style's colour, then `LocalContentColor`, which defaults to `Color.Black` outside any provider. `Surface` provides it (and `Scaffold`, `TopAppBar`, `NavigationBar` and cards all draw a `Surface`); `MaterialTheme` itself doesn't. The overlay was a plain `Box` drawn above the `Scaffold`, so it was outside every `Surface`. (From the Material 3 API; fits the symptom exactly.)
+
+**Fix:** Wrap the content in `CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface)`, and add the same provider once at the app's root as a safety net (a `Surface` inside still overrides it). (Not reported again, but not explicitly confirmed.)
+
+**Watch for:** Overlays, full-screen viewers and `AnimatedVisibility` layers beside or over a `Scaffold`, and screens built from plain `Box`es and `Column`s. Untinted `Icon`s use `LocalContentColor` too. Light mode hides the bug, so check every screen in dark mode.
+
+### A `Unit` suspend call used as a value crashes with `Float cannot be cast to kotlin.Unit`
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-android-ui-unit-suspend-call-leaks-float-classcastexception.md)
+
+**Symptom:** Tapping the current bottom-navigation tab to scroll back to the top crashed on one tab only: `java.lang.ClassCastException: java.lang.Float cannot be cast to kotlin.Unit`, in the launch lambda's `invokeSuspend`. The code was `scope.launch { when (tab) { … -> gridState.animateScrollToItem(0); Tab.C -> scrollState.animateScrollTo(0) } }`, and only the `ScrollState` branch (a `verticalScroll` column, not a lazy grid) crashed.
+
+**Cause:** Best explanation from the stack trace and how Kotlin compiles suspend calls; not reproduced in isolation. `ScrollState.animateScrollTo` is declared to return `Unit`, but its body is understood to end in a call that returns a `Float` (the amount scrolled). A suspend call in tail position passes the caller's continuation straight on, so when it really suspends (an animation always does), the caller is resumed with that `Float`. Usually nobody looks at the result. Here the `when` was a `Unit` expression and the last expression of the lambda, so the compiler cast the resumed value to `Unit`, and the cast failed. (A first explanation, that the branches' types were merged, was wrong: the declared type is `Unit`.)
+
+**Fix:** Call the scroll functions as statements in their own `suspend fun` that returns `Unit` explicitly, and launch that. Ending the lambda with an explicit `Unit` after the `when` should also work. (Not confirmed.)
+
+**Watch for:** A `Unit` suspend call whose result is used as a value: the last expression of a lambda inside `if` or `when`, `val x = …`, after `?:`, or through a generic `T` (`async`/`await`, `runCatching`, `withContext`). It only crashes when the call actually suspends, so instant paths and tests with an immediate dispatcher pass. `X cannot be cast to kotlin.Unit` in `invokeSuspend` is the tell.
+
 ## Android storage and data: SAF and Room
 
 ### After `renameDocument`, `fromSingleUri` silently can't write
@@ -1117,7 +1165,7 @@ Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-ne
 
 **Fix:** Use `gradientUnits="userSpaceOnUse"` with coordinates on the chart's y-axis, so a given time maps to one colour on every bar.
 
-## Other libraries: llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib
+## Other libraries and services
 
 ### llama.cpp: a doubled BOS, and warnings that are fine to ignore
 
@@ -1202,6 +1250,18 @@ Non-public QDVC project (2026-11-15) · [report](reports/processed/2026-11-15-ot
 **Fix:** A `WSGIRequestHandler` subclass that wraps both `rfile` and `wfile` and turns any `ssl.SSLError` into a `ConnectionResetError`, passed to `run_simple(..., request_handler=…)`. Both directions must be wrapped, because of the drain after a failed write. The [report](reports/processed/2026-11-15-other-libs-werkzeug-ssl-error-on-hang-up.md) has the code. Confirmed in a local reproduction (no tracebacks for the same four hang-ups, with range requests and form posts still working); not confirmed on the original server.
 
 **Watch for:** On a TLS server, this traceback usually just means a client went away, so look for whatever else went wrong. Werkzeug's development server isn't meant for production use.
+
+### Immich's metadata search returns the hidden video half of each Live Photo
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-other-libs-immich-search-returns-live-photo-motion-halves.md)
+
+**Symptom:** Listing an album with `POST /search/metadata` (`{"albumIds": […], "withExif": true, …}`) returned two items for every iPhone Live Photo: the HEIC still and a `.mov` video with no thumbnail. Every request for those videos' thumbnails failed with HTTP 404. The Immich web app shows one item per Live Photo.
+
+**Cause:** Immich keeps the moving half of a Live Photo (or Android motion photo) as a separate `VIDEO` asset, linked from the still's `livePhotoVideoId` and marked `visibility: "hidden"`. As observed on server v3.3, the metadata search filtered by `albumIds` returns these hidden assets too, though Immich's own timelines and album views leave them out, and the server doesn't make thumbnails for them. (Confirmed by the failing items; the 404 explanation is from the Immich source.) A first theory, missing thumbnails for photos edited in Immich, was a dead end.
+
+**Fix:** Filter listings on the client: drop assets whose `visibility` is `"hidden"` (or `"locked"`), and any asset whose `id` is another asset's `livePhotoVideoId` (in case an older server omits `visibility`). Fetch the motion half through the still's `livePhotoVideoId` and treat it as part of the still. Clean up any stray videos already stored. Confirmed: the failures stopped. Asking the server for `"visibility": "timeline"` is an alternative, but may also drop archived assets in the album (not verified).
+
+**Watch for:** Any Immich endpoint used to list assets. Check `visibility` and `livePhotoVideoId` before counting, downloading or displaying, or album counts and storage totals will be inflated. Repeated 404s on `/assets/{id}/thumbnail` for `.mov` items are the tell.
 
 ## File formats and standards
 

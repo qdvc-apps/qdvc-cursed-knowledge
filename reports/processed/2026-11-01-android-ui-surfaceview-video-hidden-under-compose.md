@@ -1,3 +1,5 @@
+> **Outcome (2026-11-20):** New entry "A Media3 `PlayerView` in Compose plays sound but no picture" in Kotlin, Jetpack Compose and Android UI.
+
 # A Media3 `PlayerView` in Compose plays sound but no picture when other content is drawn over it
 
 - **Date encountered:** 2026-11 (month only)

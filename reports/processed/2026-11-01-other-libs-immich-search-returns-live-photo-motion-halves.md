@@ -1,3 +1,5 @@
+> **Outcome (2026-11-20):** New entry "Immich's metadata search returns the hidden video half of each Live Photo" in Other libraries and services (section renamed so it no longer needs renaming for each new library).
+
 # Immich's `POST /search/metadata` returns the hidden video half of each Live Photo as an asset of its own
 
 - **Date encountered:** 2026-11 (month only)

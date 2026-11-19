@@ -50,7 +50,7 @@ Search the [Cursed Knowledge document](../README.md) and the files in [`reports/
 | `android-build` | Android build tooling: Gradle and Kotlin |
 | `windows` | Windows, .NET and WinForms |
 | `web` | Web: HTML, CSS, SVG, JavaScript and Plotly |
-| `other-libs` | Other libraries (llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib, …) |
+| `other-libs` | Other libraries and services (llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib, Immich, …) |
 | `file-formats` | File formats and standards |
 | `ai-mistakes` | Mistakes the AI kept repeating |
 | `new` | None of these fit; suggest a section name in the **Platform** field |

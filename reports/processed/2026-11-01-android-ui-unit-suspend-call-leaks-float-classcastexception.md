@@ -1,3 +1,5 @@
+> **Outcome (2026-11-20):** New entry "A `Unit` suspend call used as a value crashes with `Float cannot be cast to kotlin.Unit`" in Kotlin, Jetpack Compose and Android UI.
+
 # `scrollState.animateScrollTo` inside a `when` expression crashes with `Float cannot be cast to kotlin.Unit`
 
 - **Date encountered:** 2026-11 (month only)
