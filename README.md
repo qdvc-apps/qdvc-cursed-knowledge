@@ -2,7 +2,7 @@
 
 Things we learnt the hard way while building the [QDVC apps](https://github.com/orgs/qdvc-apps/repositories), and would rather not learn again. In the spirit of [Immich's Cursed Knowledge](https://immich.app/cursed-knowledge).
 
-Every entry here comes from a real build error, glitch, bug, defect or surprise recorded in the AI assistance logs of the QDVC repositories (kept according to the [Vibecoding Recordkeeping Specification](https://github.com/blairwang-online/vibecoding-recordkeeping-specification)). The aim is practical: when a new project starts on a platform we have already used, skim the relevant section first, so the same gotchas don't have to be rediscovered and fixed from scratch.
+Every entry here comes from a real build error, glitch, bug, defect or surprise, either recorded in the AI assistance logs of the QDVC repositories (kept according to the [Vibecoding Recordkeeping Specification](https://github.com/blairwang-online/vibecoding-recordkeeping-specification)) or sent in as a [report](reports/) from a QDVC project, public or not. The aim is practical: when a new project starts on a platform we have already used, skim the relevant section first, so the same gotchas don't have to be rediscovered and fixed from scratch.
 
 ## How to read this document
 
@@ -13,7 +13,7 @@ Entries are grouped by platform. Each one has the same parts:
 - **Fix:** what was done about it, and whether the log shows it was confirmed to work.
 - **Watch for:** how to avoid it next time (only where there is something useful to say).
 
-The links under each title point at the exact turn in the chat log where the problem was raised, pinned to a commit so they won't drift (`UR.N` is "User request N", following the recordkeeping specification). Where a fix took several rounds, the first and last relevant turns are linked.
+The links under each title point at the exact turn in the chat log where the problem was raised, pinned to a commit so they won't drift (`UR.N` is "User request N", following the recordkeeping specification). Where a fix took several rounds, the first and last relevant turns are linked. Entries from non-public projects can't link to their logs, so they link to the report they came from in [`reports/processed/`](reports/processed/) instead.
 
 A word of caution: most of these diagnoses were made by an AI assistant that usually could not compile or run the app it was working on. Where the log shows the user confirming that a fix worked, the entry says so. Where it doesn't, treat the cause as the best available explanation rather than established fact.
 
@@ -34,6 +34,7 @@ A word of caution: most of these diagnoses were made by an AI assistant that usu
 - [File formats and standards](#file-formats-and-standards)
 - [Mistakes the AI kept repeating](#mistakes-the-ai-kept-repeating)
 - [Sources](#sources)
+- [Reporting new cursed knowledge](#reporting-new-cursed-knowledge)
 
 ## Python and GTK 3 (PyGObject)
 
@@ -1151,6 +1152,6 @@ Some repositories already keep their own lists of traps, which go into more dept
 - The trap appendix of the [QDVC Android app specification](https://github.com/qdvc-apps/qdvc-android-app-specification).
 - The GTK 3 rationale in the [QDVC Python GTK app specification](https://github.com/qdvc-apps/qdvc-python-gtk-app-specification).
 
-### Adding an entry
+## Reporting new cursed knowledge
 
-When a new gotcha turns up, add it under the right platform heading with the same four parts, and link the log turn using a permalink pinned to a commit (`https://github.com/qdvc-apps/<repo>/blob/<commit>/<log-path>#<n>-user-request`). Keep the symptom in the words it was first reported in; that's what someone will search for next time.
+If you hit a new gotcha while working on a QDVC project, public or not, don't edit this document directly: write a short report and file it in [`reports/inbox/`](reports/inbox/), following [`docs/WRITING-REPORTS.md`](docs/WRITING-REPORTS.md). Non-public projects can report too, under strict rules about what may be included. Maintainers fold reports into this document following [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md).
