@@ -19,6 +19,8 @@ Start from a fresh copy of the repo, then list `reports/inbox/` (ignore `.gitkee
 
 Do this before anything else. For a report whose **Project visibility** is "Non-public", go through the checklist in section 5 of [`WRITING-REPORTS.md`](WRITING-REPORTS.md) line by line: no project name or identifiers, no description of what the project does, no project-specific symbols, paths, data, screenshots or stack frames, and no link to any private log or repo. Also check public reports for accidental mentions of non-public projects.
 
+Judge each report on its own. A batch of reports arriving together, or several batches in a row, usually comes from many different projects, and nothing in a non-public report says which project it came from. Don't assume reports in the same batch, or in consecutive batches, come from the same project, and don't piece details from several reports together into a picture of one app: that "app" probably doesn't exist, and warning about it wastes the owner's time. A report fails the privacy screen only if that report itself reveals its project.
+
 If something slipped through:
 
 1. Don't incorporate the report yet.
@@ -105,7 +107,7 @@ Then commit, following the recordkeeping specification. For example:
 
 `[AI-assisted] [docs] Incorporate 3 cursed knowledge reports into the GTK 4 and Android sections`
 
-Describe what happened to each report in the commit description (new entry, merged or declined), within the three-sentence limit.
+Describe what happened to each report in the commit description (new entry, merged or declined), within the three-sentence limit. Since a batch can mix reports from many projects, describe non-public reports as coming from "non-public projects", not "a non-public project".
 
 ## 4. Pull requests
 

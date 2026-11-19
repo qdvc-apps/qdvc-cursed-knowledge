@@ -13,7 +13,7 @@ Entries are grouped by platform. Each one has the same parts:
 - **Fix:** what was done about it, and whether the log shows it was confirmed to work.
 - **Watch for:** how to avoid it next time (only where there is something useful to say).
 
-The links under each title point at the exact turn in the chat log where the problem was raised, pinned to a commit so they won't drift (`UR.N` is "User request N", following the recordkeeping specification). Where a fix took several rounds, the first and last relevant turns are linked. Entries from non-public projects can't link to their logs, so they link to the report they came from in [`reports/processed/`](reports/processed/) instead.
+The links under each title point at the exact turn in the chat log where the problem was raised, pinned to a commit so they won't drift (`UR.N` is "User request N", following the recordkeeping specification). Where a fix took several rounds, the first and last relevant turns are linked. Entries from non-public projects can't link to their logs, so they link to the report they came from in [`reports/processed/`](reports/processed/) instead. Entries marked "Non-public QDVC project" don't all come from the same project.
 
 A word of caution: most of these diagnoses were made by an AI assistant that usually could not compile or run the app it was working on. Where the log shows the user confirming that a fix worked, the entry says so. Where it doesn't, treat the cause as the best available explanation rather than established fact.
 
