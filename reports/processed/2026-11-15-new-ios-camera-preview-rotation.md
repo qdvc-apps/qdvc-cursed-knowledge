@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "On iPad in landscape, the camera preview moves at right angles to the camera" in a new section, Swift, SwiftUI and UIKit (iOS and iPadOS).
+
 # On iPad in landscape, an `AVCaptureVideoPreviewLayer` moves at right angles to the camera
 
 - **Date encountered:** 2026-11-15

@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "`by rememberUpdatedState(…)` needs `import androidx.compose.runtime.getValue`" in Kotlin, Jetpack Compose and Android UI.
+
 # `by rememberUpdatedState(...)` needs `import androidx.compose.runtime.getValue`
 
 - **Date encountered:** 2026-11-19

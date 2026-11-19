@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "An `Int` SDK constant turns an `if` into `Number & Comparable<*>`" in Kotlin, Jetpack Compose and Android UI.
+
 # An SDK constant that's an `Int` turns an `if` into `Number & Comparable<*>`
 
 - **Date encountered:** 2026-11-19

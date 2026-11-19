@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "A `var` with `private set` still clashes with your own `setX()`" in Kotlin, Jetpack Compose and Android UI.
+
 # A `var` with a `private set` still clashes with your own `setX()` function
 
 - **Date encountered:** 2026-11-19

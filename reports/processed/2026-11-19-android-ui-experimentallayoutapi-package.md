@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "`ExperimentalLayoutApi` isn't where `ExperimentalFoundationApi` is" in Kotlin, Jetpack Compose and Android UI; the keyboard entry now mentions the opt-in and links to it.
+
 # `ExperimentalLayoutApi` isn't in the same package as `ExperimentalFoundationApi`
 
 - **Date encountered:** 2026-11-19

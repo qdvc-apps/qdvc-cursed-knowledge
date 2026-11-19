@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "From Android 15, match the navigation bar by turning its scrim off" in Kotlin, Jetpack Compose and Android UI; the Samsung system-bars entry now links to it.
+
 # From Android 15, matching the system navigation bar means turning its scrim off, not setting its colour
 
 - **Date encountered:** 2026-11-19

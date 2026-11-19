@@ -43,12 +43,14 @@ Search the [Cursed Knowledge document](../README.md) and the files in [`reports/
 | `git` | Git |
 | `macos-swift` | Swift, SwiftUI and AppKit (macOS) |
 | `macos-toolchain` | macOS toolchain: Xcode and SwiftPM |
+| `ios` | Swift, SwiftUI and UIKit (iOS and iPadOS) |
 | `android-ui` | Kotlin, Jetpack Compose and Android UI |
 | `android-data` | Android storage and data: SAF and Room |
+| `android-platform` | Android platform: permissions, networking and background work |
 | `android-build` | Android build tooling: Gradle and Kotlin |
 | `windows` | Windows, .NET and WinForms |
 | `web` | Web: HTML, CSS, SVG, JavaScript and Plotly |
-| `other-libs` | Other libraries (llama.cpp, Textual, WeasyPrint, matplotlib, …) |
+| `other-libs` | Other libraries (llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib, …) |
 | `file-formats` | File formats and standards |
 | `ai-mistakes` | Mistakes the AI kept repeating |
 | `new` | None of these fit; suggest a section name in the **Platform** field |

@@ -26,12 +26,14 @@ A word of caution: most of these diagnoses were made by an AI assistant that usu
 - [Git](#git)
 - [Swift, SwiftUI and AppKit (macOS)](#swift-swiftui-and-appkit-macos)
 - [macOS toolchain: Xcode and SwiftPM](#macos-toolchain-xcode-and-swiftpm)
+- [Swift, SwiftUI and UIKit (iOS and iPadOS)](#swift-swiftui-and-uikit-ios-and-ipados)
 - [Kotlin, Jetpack Compose and Android UI](#kotlin-jetpack-compose-and-android-ui)
 - [Android storage and data: SAF and Room](#android-storage-and-data-saf-and-room)
+- [Android platform: permissions, networking and background work](#android-platform-permissions-networking-and-background-work)
 - [Android build tooling: Gradle and Kotlin](#android-build-tooling-gradle-and-kotlin)
 - [Windows, .NET and WinForms](#windows-net-and-winforms)
 - [Web: HTML, CSS, SVG, JavaScript and Plotly](#web-html-css-svg-javascript-and-plotly)
-- [Other libraries: llama.cpp, Textual, WeasyPrint, matplotlib](#other-libraries-llamacpp-textual-weasyprint-matplotlib)
+- [Other libraries: llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib](#other-libraries-llamacpp-textual-weasyprint-werkzeug-matplotlib)
 - [File formats and standards](#file-formats-and-standards)
 - [Mistakes the AI kept repeating](#mistakes-the-ai-kept-repeating)
 - [Sources](#sources)
@@ -649,6 +651,18 @@ Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-ma
 
 **Watch for:** Local names that match a method of the enclosing type, especially short verbs and nouns (`save`, `load`, `count`, `items`), and `let x = x(…)` or `guard let x = x(…)` patterns, which can also give "use of local variable before its declaration". A quick search for locals that share a name with a method called later in the same function catches them before a build. This is also one of the [errors an assistant that can't compile tends to leave behind](#code-it-couldnt-compile-run-or-see).
 
+### Views placed with `.offset` leave their container too narrow to hover or click
+
+Non-public QDVC project (2026-11-15) · [report](reports/processed/2026-11-15-macos-swift-offset-does-not-change-layout.md)
+
+**Symptom:** A custom bar made of segments laid end to end stopped responding part-way along: hovering, clicking and dragging worked over the first stretch and did nothing beyond it, although the later segments were drawn correctly. Bars with a single segment worked all the way along. The data in the later segments was suspected first, and was fine.
+
+**Cause:** The dead zone started at the width of the longest segment. Each segment was a fixed-width view in a `ZStack(alignment: .leading)`, moved into place with `.offset(x:)`. `.offset` moves where a view is drawn, not the frame layout gives it, so the `ZStack` was only as wide as its widest child, and the `.onHover`, `.onContinuousHover` and drag gesture attached to it only covered that width. (Best explanation from the code; it fits the symptom exactly.)
+
+**Fix:** Give the container an explicit frame across the full width (`.frame(width: totalWidth, height: …, alignment: .leading)`) and a `.contentShape(Rectangle())` before the hover and gesture modifiers. Positioning the pieces with layout (an `HStack` with computed widths, or leading padding) instead of `.offset` also works. (Not confirmed.)
+
+**Watch for:** Any custom slider, timeline, ruler or chart built by offsetting pieces in a `ZStack`. Everything attached to the container (`onHover`, `contentShape`, gestures, `.background`, `.overlay`) follows the pieces' un-offset frames, and thumbs or markers placed with `.offset` can be clipped or untouchable for the same reason. A symptom that starts at a point matching the size of one of the parts points to layout, not data.
+
 ## macOS toolchain: Xcode and SwiftPM
 
 ### Builds with only the Command Line Tools fail on `SwiftUIMacros`
@@ -692,6 +706,20 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 **Fix:** Don't shell out to `/usr/bin` developer tools from a sandboxed app. Implement what's needed natively, or embed your own signed copy of the tool in the app bundle if its licence allows it. Test-only code that runs outside the sandbox (such as `swift test`) can still use them.
 
 **Watch for:** An early "just shell out to the command-line tool" plan for a Mac app that must be sandboxed. Even unsandboxed, a Mac with no developer tools installed shows an installer prompt for `/usr/bin/git` instead of running it.
+
+## Swift, SwiftUI and UIKit (iOS and iPadOS)
+
+### On iPad in landscape, the camera preview moves at right angles to the camera
+
+Non-public QDVC project (2026-11-15) · [report](reports/processed/2026-11-15-new-ios-camera-preview-rotation.md)
+
+**Symptom:** A camera preview (a QR code scanner hosted in SwiftUI through `UIViewControllerRepresentable`) worked in portrait. On an iPad in landscape, panning the iPad moved the picture at right angles, as if the preview were turned 90°.
+
+**Cause:** An `AVCaptureVideoPreviewLayer` shows frames in the camera sensor's own orientation unless its connection is told to rotate them, and nothing updated that as the interface rotated. The older way, setting `connection.videoOrientation` from the interface orientation, has been deprecated since iOS 17. (Best explanation from the code and Apple's API; not measured.)
+
+**Fix:** Create an `AVCaptureDevice.RotationCoordinator(device:previewLayer:)` (iOS 17 and later), observe its `videoRotationAngleForHorizonLevelPreview` with key-value observation, and set the preview connection's `videoRotationAngle` to it after checking `isVideoRotationAngleSupported`. Apply it at setup, in `viewDidLayoutSubviews` and in `viewWillTransition(to:with:)`, and keep the layer's `frame` equal to the view's bounds on every layout. (Not confirmed.)
+
+**Watch for:** Testing only on an iPhone in portrait hides this completely; iPad apps are never portrait-only. The same applies to any custom camera view, such as document scanning or video capture. Code samples that set `videoOrientation` predate the rotation coordinator; they still compile, with a deprecation warning.
 
 ## Kotlin, Jetpack Compose and Android UI
 
@@ -753,7 +781,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 
 **Cause:** `enableEdgeToEdge()` sets `decorFitsSystemWindows = false`, and together with the manifest's `adjustResize` the keyboard was counted twice. Worse, the composer sat above the app's own bottom `NavigationBar`, so `imePadding()` over-lifted by the whole bar (its content plus its inset). The intuitive fix, `WindowInsets.ime.exclude(WindowInsets.navigationBars)`, only subtracts the system inset and leaves most of the gap.
 
-**Fix:** Set `android:windowSoftInputMode="adjustNothing"`, hide the bottom `NavigationBar` while `WindowInsets.isImeVisible`, and apply a single plain `imePadding()` to the bottom-most element. `adjustResize` is fine for apps with no input anchored to the bottom of the screen.
+**Fix:** Set `android:windowSoftInputMode="adjustNothing"`, hide the bottom `NavigationBar` while `WindowInsets.isImeVisible`, and apply a single plain `imePadding()` to the bottom-most element. `adjustResize` is fine for apps with no input anchored to the bottom of the screen. `WindowInsets.isImeVisible` needs `@OptIn(ExperimentalLayoutApi::class)`, imported from `androidx.compose.foundation.layout` ([see below](#experimentallayoutapi-isnt-where-experimentalfoundationapi-is)).
 
 ### System bars stay black on Samsung, and the nav bar colour doesn't quite match
 
@@ -763,7 +791,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 
 **Cause:** Without edge-to-edge, the system draws its own bar backgrounds. Once fixed, the system nav bar still didn't quite match the app's bottom bar, because Material 3's `NavigationBar` applies a tonal-elevation tint, so its colour isn't the raw `surface` colour.
 
-**Fix:** Call `enableEdgeToEdge`, drive light/dark bar icons through `WindowInsetsControllerCompat` from the resolved theme, and colour-match against the bottom bar's actual container colour.
+**Fix:** Call `enableEdgeToEdge`, drive light/dark bar icons through `WindowInsetsControllerCompat` from the resolved theme, and colour-match against the bottom bar's actual container colour. That applies to apps targeting SDK 34 or lower; from SDK 35, see [turning the scrim off](#from-android-15-match-the-navigation-bar-by-turning-its-scrim-off).
 
 ### `ParagraphStyle` plus a literal newline gives double line breaks
 
@@ -834,6 +862,66 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 **Cause:** `HapticFeedbackConstants.CONTEXT_CLICK` maps to the platform's lightest predefined effect (about `EFFECT_TICK`).
 
 **Fix:** Use `VIRTUAL_KEY` for taps and keep the faint constants for repeating sensations. Use `View.performHapticFeedback`, not `Vibrator`, so the system setting is honoured and no `VIBRATE` permission is needed.
+
+### `ExperimentalLayoutApi` isn't where `ExperimentalFoundationApi` is
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-android-ui-experimentallayoutapi-package.md)
+
+**Symptom:** Four errors from one import line: `Unresolved reference 'ExperimentalLayoutApi'` (twice), `Annotation argument must be a compile-time constant`, and `The API of this layout is experimental and is likely to change in the future` on a use of `WindowInsets.isImeVisible`.
+
+**Cause:** The import was `androidx.compose.foundation.ExperimentalLayoutApi`, by analogy with `androidx.compose.foundation.ExperimentalFoundationApi`. But `ExperimentalLayoutApi` lives one package deeper, in `androidx.compose.foundation.layout`, beside the layout APIs it marks. The other three errors follow from the first: with the marker unresolved, the `@OptIn` is invalid, so the experimental-API check fires anyway.
+
+**Fix:** `import androidx.compose.foundation.layout.ExperimentalLayoutApi`. Confirmed: the next build got past all four errors.
+
+**Watch for:** Compose's opt-in markers live beside the APIs they mark (`…foundation.ExperimentalFoundationApi`, `…foundation.layout.ExperimentalLayoutApi`, `…material3.ExperimentalMaterial3Api`). If `@OptIn` gives "Annotation argument must be a compile-time constant", the marker class itself didn't resolve: fix the import first.
+
+### An `Int` SDK constant turns an `if` into `Number & Comparable<*>`
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-android-ui-int-sdk-constant-in-long-if-expression.md)
+
+**Symptom:** `Argument type mismatch: actual type is 'Number & Comparable<CapturedType(*)>', but 'Long' was expected.`, on a call to `JobInfo.Builder.setEstimatedNetworkBytes`.
+
+**Cause:** `JobInfo.NETWORK_BYTES_UNKNOWN` is declared as a Java `int`, although the methods that accept it take a `long`. Kotlin never widens `Int` to `Long` implicitly, so the branches of `if (bytes > 0) bytes else JobInfo.NETWORK_BYTES_UNKNOWN` (a `Long` and an `Int`) unify to their common supertype, which is the strange type in the message. A literal `0` would have been fine, because literals take the expected type; a named constant doesn't.
+
+**Fix:** `JobInfo.NETWORK_BYTES_UNKNOWN.toLong()` (and `0L` for clarity). Confirmed: the next build got past it.
+
+**Watch for:** Any Java constant declared `int` but meant for a `long` parameter, typically an "unset" or "unknown" sentinel. If an error mentions `Number & Comparable<…>`, look for an `if`, `when` or `?:` whose branches mix `Int` and `Long`.
+
+### From Android 15, match the navigation bar by turning its scrim off
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-android-ui-nav-bar-colour-ignored-from-android-15.md)
+
+**Symptom:** (Found while carrying an older app's approach into a new one, before running on a device.) Apps targeting SDK 34 match the system navigation bar to the app's bottom bar by setting `window.navigationBarColor` (and `statusBarColor`). For apps targeting SDK 35 or later, that no longer applies.
+
+**Cause:** From the platform documentation and the androidx source (`EdgeToEdge.kt`); not yet measured. Android 15 forces apps targeting SDK 35+ edge to edge. The status bar and gesture navigation bar are transparent, but the three-button navigation bar gets a translucent system scrim unless `Window.setNavigationBarContrastEnforced(false)`, and `setNavigationBarColor`/`setStatusBarColor` are deprecated (and flagged by Play). `enableEdgeToEdge()`'s default navigation bar style is `SystemBarStyle.auto(…)`, which leaves contrast enforcement on; only an explicit `SystemBarStyle.light(…)` or `.dark(…)` turns it off. On API 35+ androidx also draws a non-transparent scrim as its own protection view rather than as the window colour.
+
+**Fix:** Call `enableEdgeToEdge` with explicit, fully transparent styles chosen from the resolved theme (`SystemBarStyle.dark(Color.TRANSPARENT)`, or `SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)`), and set `window.isNavigationBarContrastEnforced = false` for clarity. Let the app's bottom `NavigationBar` supply the colour (`containerColor = MaterialTheme.colorScheme.surface`, `tonalElevation = 0.dp`, default `windowInsets`, so it extends behind the buttons). Call it again when the theme changes and after full-screen views. (Not confirmed on a device.)
+
+**Watch for:** Gesture navigation has no scrim either way, so test with three-button navigation. Screens without the bottom bar need their own background behind the transparent navigation bar. `enableEdgeToEdge()` with no arguments isn't "transparent".
+
+### A `var` with `private set` still clashes with your own `setX()`
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-android-ui-private-setter-still-clashes-with-setx.md)
+
+**Symptom:** `Platform declaration clash: The following declarations have the same JVM signature (setTheme(Ljava/lang/String;)V)`, listing the property's generated setter and a hand-written `fun setTheme(value: String)`. Gradle summarised it as `CONFLICTING_JVM_DECLARATIONS`.
+
+**Cause:** Every Kotlin `var` compiles to JVM `getX`/`setX` methods. A `private set` only changes the setter's visibility; the JVM method still exists, and the JVM doesn't allow two methods with the same name and parameter types in one class, whatever their visibility. Delegated properties (`by mutableStateOf(…)`) behave the same. The code was ported from Swift, where `private(set) var scale` beside `func setScale(_:)` is a common, legal pattern.
+
+**Fix:** Rename the functions (`setScale` became `changeScale`). Alternatives: drop the `private set`, or rename the setter's JVM name with `@set:JvmName("…")`. (The renaming cleared the reported errors; the rest of the build wasn't confirmed.)
+
+**Watch for:** The same clash between `val x` and `fun getX()`, and between `val isX` and `fun isX()`. It's most likely when porting from Swift. Search for `fun set[A-Z]` and `fun get[A-Z]` and check each against the class's properties, because the compiler only reports it at the JVM-signature stage.
+
+### `by rememberUpdatedState(…)` needs `import androidx.compose.runtime.getValue`
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-android-ui-state-delegate-needs-getvalue-import.md)
+
+**Symptom:** `Type 'State<(String) -> Unit>' has no method 'getValue(Nothing?, KProperty0<*>)', so it cannot serve as a delegate.`, followed by an unresolved reference to the delegated property.
+
+**Cause:** Property delegation calls operator functions named `getValue` (and `setValue` for a `var`). For Compose's `State` and `MutableState` these are extension functions in `androidx.compose.runtime`, not members, so they only apply when imported. Android Studio usually adds the import when you type `by`, so this mostly bites code written outside the IDE.
+
+**Fix:** `import androidx.compose.runtime.getValue`, plus `import androidx.compose.runtime.setValue` for any `var … by`. Confirmed: the next build got past both errors.
+
+**Watch for:** The message looks like a type problem but is a missing import. Check every file with `by remember`, `by mutableStateOf`, `by produceState`, `by animate…AsState` or `by rememberUpdatedState`; one `getValue` import covers all the overloads.
 
 ## Android storage and data: SAF and Room
 
@@ -906,6 +994,20 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 **Cause:** Room only exposes FTS3/FTS4, because FTS5 isn't available in the SQLite shipped with older Android versions.
 
 **Fix:** Use `@Fts4`. FTS5 would mean giving up Room's schema management and hand-writing virtual-table SQL and triggers.
+
+## Android platform: permissions, networking and background work
+
+### Targeting Android 17, local network connections just time out
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-new-android-17-local-network-permission.md)
+
+**Symptom:** (Found while raising targetSdk to 37, before running on a device.) An app that talks to a server on the home network by IP address or `.local` name would see its connections time out, which it would take to mean "server unreachable", with no error naming a permission.
+
+**Cause:** From the [Android documentation](https://developer.android.com/privacy-and-security/local-network-permission); not yet measured. For apps targeting Android 17 (SDK 37) or higher, local network traffic is blocked unless the user grants `ACCESS_LOCAL_NETWORK`. Apps targeting 36 or lower keep an implicit grant through `INTERNET`, but only until they raise targetSdk. It's a runtime permission in the `NEARBY_DEVICES` group (users who already granted, say, Bluetooth aren't asked again). Blocked TCP connections typically time out and UDP gets `EPERM`. It applies to every networking API (sockets, `HttpURLConnection`, OkHttp, `NsdManager`) and to resolving `.local` names; internet traffic, mobile data and DNS to a local server on port 53 are unaffected.
+
+**Fix:** Declare `<uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />`, request it with a short explanation before the first connection, and check it before connecting, but only when `Build.VERSION.SDK_INT >= 37` (on earlier versions the permission doesn't exist and would always read as denied). Show a "not allowed" state rather than "unreachable", offer the app's settings page if the system won't ask again, and re-check in `onResume`. Where it fits, the system pickers (such as `NsdManager`'s mDNS picker) avoid the broad permission altogether. (Not confirmed on a device.)
+
+**Watch for:** Background work needs the permission too, since the grant belongs to the app. Any app that talks to a LAN server, NAS, printer, speaker or local web UI is affected the day it targets 37, even if none of its code changed. On Android 16 the restriction can be tried early with `adb shell am compat enable RESTRICT_LOCAL_NETWORK <package>`.
 
 ## Android build tooling: Gradle and Kotlin
 
@@ -1015,7 +1117,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 
 **Fix:** Use `gradientUnits="userSpaceOnUse"` with coordinates on the chart's y-axis, so a given time maps to one colour on every bar.
 
-## Other libraries: llama.cpp, Textual, WeasyPrint, matplotlib
+## Other libraries: llama.cpp, Textual, WeasyPrint, Werkzeug, matplotlib
 
 ### llama.cpp: a doubled BOS, and warnings that are fine to ignore
 
@@ -1088,6 +1190,18 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos
 **Cause:** Text was measured in points but the width budget was computed in pixels, before the final figure size was set.
 
 **Fix:** Convert axis units to points correctly, and hard-break any single word too wide for the box.
+
+### Werkzeug over TLS logs a client hanging up as `ssl.SSLError`
+
+Non-public QDVC project (2026-11-15) · [report](reports/processed/2026-11-15-other-libs-werkzeug-ssl-error-on-hang-up.md)
+
+**Symptom:** A Flask app served over HTTPS by Werkzeug's own server (`run_simple` with an SSL context) logged "Error on request" tracebacks ending in `ssl.SSLError: [SYS] unknown error (_ssl.c:2501)` while sending large files. It looked like a server crash and was a red herring: the real problem was elsewhere.
+
+**Cause:** Confirmed by reproducing it with a real TLS server. Browsers routinely abandon a large response part-way, for example to request a different byte range when seeking. Over plain HTTP that raises a `ConnectionError`, which Werkzeug treats as a dropped connection and doesn't log. Over TLS the same hang-up can surface as a bare `ssl.SSLError` ("[SYS] unknown error", "bad length" and others, depending on Python and OpenSSL versions), which is an `OSError` but not a `ConnectionError`, so Werkzeug logs a full traceback. Werkzeug then drains the request body, which raises a second SSL error ("unexpected eof while reading").
+
+**Fix:** A `WSGIRequestHandler` subclass that wraps both `rfile` and `wfile` and turns any `ssl.SSLError` into a `ConnectionResetError`, passed to `run_simple(..., request_handler=…)`. Both directions must be wrapped, because of the drain after a failed write. The [report](reports/processed/2026-11-15-other-libs-werkzeug-ssl-error-on-hang-up.md) has the code. Confirmed in a local reproduction (no tracebacks for the same four hang-ups, with range requests and form posts still working); not confirmed on the original server.
+
+**Watch for:** On a TLS server, this traceback usually just means a client went away, so look for whatever else went wrong. Werkzeug's development server isn't meant for production use.
 
 ## File formats and standards
 

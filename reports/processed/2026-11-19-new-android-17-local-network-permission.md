@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "Targeting Android 17, local network connections just time out" in a new section, Android platform: permissions, networking and background work.
+
 # Targeting Android 17, connections to the local network just time out without `ACCESS_LOCAL_NETWORK`
 
 - **Date encountered:** 2026-11-19

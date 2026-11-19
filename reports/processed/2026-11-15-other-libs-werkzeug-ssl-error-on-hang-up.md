@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "Werkzeug over TLS logs a client hanging up as `ssl.SSLError`" in Other libraries (section renamed to include Werkzeug). The entry links back here for the code.
+
 # Werkzeug logs a client hanging up over TLS as `ssl.SSLError: [SYS] unknown error`
 
 - **Date encountered:** 2026-11-15

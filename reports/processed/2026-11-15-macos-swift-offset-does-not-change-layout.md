@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "Views placed with `.offset` leave their container too narrow to hover or click" in Swift, SwiftUI and AppKit (macOS).
+
 # Views placed with `.offset` leave their container (and its hover and click area) too narrow
 
 - **Date encountered:** 2026-11-15
