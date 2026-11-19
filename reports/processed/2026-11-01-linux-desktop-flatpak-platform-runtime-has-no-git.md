@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "The GNOME `.Platform` runtime has no `git`, though builds see it" in Linux desktop integration and packaging.
+
 # The GNOME Flatpak `.Platform` runtime has no `git`, even though builds see it
 
 - **Date encountered:** 2026-11-01 (month only)

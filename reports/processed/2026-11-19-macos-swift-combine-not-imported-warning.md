@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry on Combine types in declarations warning "'Combine' was not imported by this file", in Swift, SwiftUI and AppKit (macOS).
+
 # `Timer.publish(…).autoconnect()` in a SwiftUI view warns "'Combine' was not imported by this file"
 
 - **Date encountered:** 2026-11-19

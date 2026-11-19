@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "A local constant hides a method with the same name" in Swift, SwiftUI and AppKit (macOS).
+
 # A local constant hides a method with the same base name: "cannot call value of non-function type"
 
 - **Date encountered:** 2026-11-19

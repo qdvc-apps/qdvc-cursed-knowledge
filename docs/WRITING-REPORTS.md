@@ -40,6 +40,7 @@ Search the [Cursed Knowledge document](../README.md) and the files in [`reports/
 | `gtk4` | GTK 4 and libadwaita |
 | `linux-desktop` | Linux desktop integration and packaging |
 | `python-shell` | Python, the shell and the terminal |
+| `git` | Git |
 | `macos-swift` | Swift, SwiftUI and AppKit (macOS) |
 | `macos-toolchain` | macOS toolchain: Xcode and SwiftPM |
 | `android-ui` | Kotlin, Jetpack Compose and Android UI |

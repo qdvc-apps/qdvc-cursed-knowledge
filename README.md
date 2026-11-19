@@ -23,6 +23,7 @@ A word of caution: most of these diagnoses were made by an AI assistant that usu
 - [GTK 4 and libadwaita](#gtk-4-and-libadwaita)
 - [Linux desktop integration and packaging](#linux-desktop-integration-and-packaging)
 - [Python, the shell and the terminal](#python-the-shell-and-the-terminal)
+- [Git](#git)
 - [Swift, SwiftUI and AppKit (macOS)](#swift-swiftui-and-appkit-macos)
 - [macOS toolchain: Xcode and SwiftPM](#macos-toolchain-xcode-and-swiftpm)
 - [Kotlin, Jetpack Compose and Android UI](#kotlin-jetpack-compose-and-android-ui)
@@ -342,6 +343,18 @@ Keep the WM class and icon name as single constants in one module. Check with `x
 
 **Fix:** `git add -f` the manifest, or add `!packaging/flatpak/*.json` to `.gitignore`. Tell users to copy their config across once. Pick a GNOME runtime that ships the libadwaita version the app needs (1.7+ here).
 
+### The GNOME `.Platform` runtime has no `git`, though builds see it
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-linux-desktop-flatpak-platform-runtime-has-no-git.md)
+
+**Symptom:** (Found while planning; not tested.) A Flatpak app that runs `git` (or another command-line tool) at run time fails with "command not found" or `FileNotFoundError`, although everything worked during the build.
+
+**Cause:** `git` is in the `.Sdk` runtime (`org.gnome.Sdk`), which `flatpak-builder` builds against, but not in the `.Platform` runtime (`org.gnome.Platform`) that installed apps run on. [Meld hit the same problem](https://gitlab.gnome.org/GNOME/meld/issues/319).
+
+**Fix:** Build `git` into the Flatpak as an extra module in the manifest, or don't depend on the binary at run time. Running the app against the SDK (`flatpak run --runtime=org.gnome.Sdk//<version> <app-id>`) hides the problem during development but doesn't fix it.
+
+**Watch for:** Any command-line tool an app runs at run time. If it's only in the `.Sdk`, users won't have it, so test the installed app, not just `flatpak-builder --run`.
+
 ## Python, the shell and the terminal
 
 ### oh-my-zsh ignores completions added to `fpath` after it loads
@@ -403,6 +416,26 @@ Keep the WM class and icon name as single constants in one module. Check with `x
 **Cause:** The whole page was one big f-string, with no autoescaping of data values either.
 
 **Fix:** Move CSS and JavaScript into plain asset files, then move the HTML into Jinja templates, which also autoescape data values.
+
+## Git
+
+### A plain `git pull` refuses diverged branches
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-new-git-pull-refuses-divergent-branches.md)
+
+**Symptom:** Tools, scripts and tests that expect `git pull` to merge on its own fail when the local and remote branches have both moved on:
+
+```
+hint: You have divergent branches and need to specify how to reconcile them.
+...
+fatal: Need to specify how to reconcile divergent branches.
+```
+
+**Cause:** Newer Git versions (2.33.1 and later, as far as the report could establish; 2.27 to 2.33 only warned) no longer default to a merge when a pull can't fast-forward, and make the user choose. Developers rarely notice, because their own `~/.gitconfig` usually sets `pull.rebase`. It shows up on other people's machines, and in tests that isolate Git's configuration with `GIT_CONFIG_GLOBAL=/dev/null` or a fresh `HOME`.
+
+**Fix:** Pass `--no-rebase`, `--rebase` or `--ff-only` explicitly in scripts and in any pull command shown to users. If a workflow depends on one behaviour, set `pull.rebase` in the repository's own config, which takes precedence over the user's global setting. (Workaround only.)
+
+**Watch for:** Tests that start Git from a clean configuration behave like a new user's machine. That's useful, as long as the code under test doesn't rely on the developer's personal settings.
 
 ## Swift, SwiftUI and AppKit (macOS)
 
@@ -572,6 +605,50 @@ Keep the WM class and icon name as single constants in one module. Check with `x
 
 **Fix:** Build the tooltip in a helper that returns a plain `String`, so the `String` overload is used.
 
+### Combine types in a declaration warn "'Combine' was not imported by this file"
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-macos-swift-combine-not-imported-warning.md)
+
+**Symptom:** A SwiftUI view that imported only `SwiftUI` and `AppKit` and stored a timer publisher as a property (`let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()`) warned: `cannot use generic class 'Autoconnect' in a property declaration member of a type not marked '@_implementationOnly'; 'Combine' was not imported by this file`, plus a similar warning about `Publishers`. Older SwiftUI examples use the same code without `import Combine`.
+
+**Cause:** The property's inferred type, `Publishers.Autoconnect<Timer.TimerPublisher>`, comes from Combine, which the file could only see indirectly through another import, and the compiler warns when such a type appears in a declaration. The best guess is that newer SDKs (Xcode 26 or later here) no longer make Combine's types fully visible through `import SwiftUI`.
+
+**Fix:** Add `import Combine` to every file that uses Combine types in declarations, including model files that use `ObservableObject` or `@Published` and import only `Foundation`. (Not confirmed.)
+
+**Watch for:** Any declaration whose type comes from a framework the file doesn't import directly: `AnyCancellable` properties, publishers stored for `onReceive`. If you lint imports against an allowlist, add `Combine` to it.
+
+### `Darwin.stat(path, &buf)` resolves to the struct, not the function
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-macos-swift-darwin-stat-resolves-to-struct.md)
+
+**Symptom:** Inside a type that also has its own method called `stat`, a call to the C function failed: `argument passed to call that takes no arguments` on `Darwin.stat(path, &st) == 0`, followed by `referencing operator function '==' on 'BinaryInteger' requires that 'stat' conform to 'BinaryInteger'`. The neighbouring `Darwin.lstat(path, &st)` compiled fine.
+
+**Cause:** In Darwin, `stat` is both a C struct and a C function. With the module qualifier, `Darwin.stat(…)` was resolved as the struct's no-argument initialiser, and the second error follows from comparing a struct with `0`. The qualifier was only there because, inside the type, an unqualified `stat(…)` finds the type's own method. `lstat` has no struct of the same name. (Best guess from the compiler output.)
+
+**Fix:** Call the C function from a small private helper at file scope, outside the type, where the unqualified name resolves to the function by overload:
+
+```swift
+private func cStat(_ path: String, _ buffer: inout stat) -> Int32 {
+    stat(path, &buffer)
+}
+```
+
+(Not confirmed by a complete build.)
+
+**Watch for:** Other C names that are both a struct and a function, such as `flock` and `sigaction`. Don't name your own methods after them, or call the C function through a file-scope helper.
+
+### A local constant hides a method with the same name
+
+Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-macos-swift-local-constant-hides-method.md)
+
+**Symptom:** `cannot call value of non-function type 'Int'` on a line like `try archive([path])`.
+
+**Cause:** Earlier in the same method, a local constant had the same name as an instance method (`let archive = flag ? 2 : 3`). Swift's name lookup finds the innermost declaration, the local `Int`, and doesn't fall back to the method, even though only the method makes sense with call syntax. The code was written while porting from a language where the same shape is harmless. Confirmed by renaming the constant.
+
+**Fix:** Rename the local (`let archiveIndex = …`), or call the method as `self.archive(…)`.
+
+**Watch for:** Local names that match a method of the enclosing type, especially short verbs and nouns (`save`, `load`, `count`, `items`), and `let x = x(…)` or `guard let x = x(…)` patterns, which can also give "use of local variable before its declaration". A quick search for locals that share a name with a method called later in the same function catches them before a build. This is also one of the [errors an assistant that can't compile tends to leave behind](#code-it-couldnt-compile-run-or-see).
+
 ## macOS toolchain: Xcode and SwiftPM
 
 ### Builds with only the Command Line Tools fail on `SwiftUIMacros`
@@ -603,6 +680,18 @@ Keep the WM class and icon name as single constants in one module. Check with `x
 **Cause:** SwiftPM caches its evaluation of `Package.swift`. Adding a folder doesn't count as a change to that file, so it kept the earlier "no llama.cpp" answer. Because the engine was gated on `canImport(llama)`, the missing framework silently produced a stub instead of an error.
 
 **Fix:** The build script fingerprints the framework and cleans `.build` when it changes, checks with `otool` that the executable links the framework, and reports whether the engine is included. The engine is gated on an explicit flag set in `Package.swift`, so a framework that can't be imported fails the build loudly.
+
+### Developer tools in `/usr/bin` can't run from a sandboxed Mac app
+
+Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-macos-toolchain-usr-bin-tools-refuse-app-sandbox.md)
+
+**Symptom:** (Found while planning; not tested.) Running `/usr/bin/git`, `python3`, `swift`, `otool` and similar tools through `Process` from an App Sandbox app fails with `xcrun: error: cannot be used within an App Sandbox.`
+
+**Cause:** Most developer tools in `/usr/bin` are small trampolines that call `xcrun` to find the real tool in the selected Xcode or Command Line Tools, and `xcrun` refuses to run inside the App Sandbox. According to Apple Developer Technical Support on the Apple Developer Forums, there's no way around that check. This has been reported since at least 2016.
+
+**Fix:** Don't shell out to `/usr/bin` developer tools from a sandboxed app. Implement what's needed natively, or embed your own signed copy of the tool in the app bundle if its licence allows it. Test-only code that runs outside the sandbox (such as `swift test`) can still use them.
+
+**Watch for:** An early "just shell out to the command-line tool" plan for a Mac app that must be sandboxed. Even unsandboxed, a Mac with no developer tools installed shows an installer prompt for `/usr/bin/git` instead of running it.
 
 ## Kotlin, Jetpack Compose and Android UI
 

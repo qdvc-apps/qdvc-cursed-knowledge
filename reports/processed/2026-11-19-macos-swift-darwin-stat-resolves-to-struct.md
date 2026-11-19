@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "`Darwin.stat(path, &buf)` resolves to the struct, not the function" in Swift, SwiftUI and AppKit (macOS).
+
 # `Darwin.stat(path, &buf)` resolves to the `stat` struct, not the `stat(2)` function
 
 - **Date encountered:** 2026-11-19

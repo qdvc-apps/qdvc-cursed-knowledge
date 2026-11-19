@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "Developer tools in `/usr/bin` can't run from a sandboxed Mac app" in macOS toolchain: Xcode and SwiftPM.
+
 # Developer tools in `/usr/bin` (`git`, `python3`, `otool`, …) can't run from a sandboxed Mac app
 
 - **Date encountered:** 2026-11-01 (month only)

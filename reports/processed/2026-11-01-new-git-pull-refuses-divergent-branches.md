@@ -1,3 +1,5 @@
+> **Outcome (2026-11-19):** New entry "A plain `git pull` refuses diverged branches" in a new section, Git.
+
 # A plain `git pull` refuses diverged branches unless `pull.rebase` or `pull.ff` is set
 
 - **Date encountered:** 2026-11-01 (month only)
