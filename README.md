@@ -1263,6 +1263,18 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-other
 
 **Watch for:** Any Immich endpoint used to list assets. Check `visibility` and `livePhotoVideoId` before counting, downloading or displaying, or album counts and storage totals will be inflated. Repeated 404s on `/assets/{id}/thumbnail` for `.mov` items are the tell.
 
+### networkx layouts need numpy, which a plain `pip install networkx` doesn't install
+
+Non-public QDVC project (2026-11-25) · [report](reports/processed/2026-11-25-other-libs-networkx-layout-needs-numpy.md)
+
+**Symptom:** A web page that draws a small graph returned HTTP 500 on the server with `ModuleNotFoundError: No module named 'numpy'`. It worked in development, the tests passed, and `import networkx` worked on the server; only the call that laid out the graph failed.
+
+**Cause:** networkx lists numpy, scipy and matplotlib only under its optional `default` extra (`importlib.metadata.requires("networkx")` shows `numpy>=2.2; extra == "default"`), so a plain `networkx` in `requirements.txt` installs none of them. Most of networkx is pure Python, and the functions that need numpy import it only when called, so the error appears at the first call. In networkx 3.7, with numpy and scipy hidden, `spring_layout`, `circular_layout`, `kamada_kawai_layout` and `pagerank` failed, while `shortest_path`, `connected_components`, `density`, `betweenness_centrality` and `eigenvector_centrality` still worked. The development environment already had numpy, which hid the gap. (Confirmed from the package metadata and by reproducing it with `sys.modules["numpy"] = None`.)
+
+**Fix:** Either depend on `networkx[default]` (or list `numpy` explicitly), or avoid the functions that need it. Here the graphs were small, so a short, seeded pure-Python Fruchterman–Reingold layout replaced `spring_layout`. A regression test runs the graph pages in a fresh interpreter with numpy, scipy, pandas and matplotlib hidden. (Works in tests; not yet re-checked on the server.)
+
+**Watch for:** Any library that keeps heavy dependencies in an extra: read its metadata, not just its import. Which networkx functions need numpy can change between releases. Development machines and AI sandboxes with a preinstalled scientific stack hide missing dependencies, so build a fresh virtual environment from the requirements file before release, or add a test that hides modules the project doesn't declare.
+
 ## File formats and standards
 
 ### HTML to Markdown: whitespace at emphasis edges matters
@@ -1309,7 +1321,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-other
 
 **Cause:** `@string`, `@preamble` and `@comment` aren't entries, entries can use `@type(…)` as well as `@type{…}`, and `@` can appear inside field values.
 
-**Fix:** Count only top-level entries, handle both delimiters and nested braces, tolerate spaces inside keys when verifying (trimming the ends), and report clashing keys with line numbers.
+**Fix:** Count only top-level entries, handle both delimiters and nested braces, tolerate spaces inside keys when verifying (trimming the ends), and report clashing keys with line numbers. For the line-tagged `refer`/EndNote format, see [parser rules inferred from typical samples](#parser-rules-inferred-from-typical-samples-instead-of-the-formats-definition).
 
 ## Mistakes the AI kept repeating
 
@@ -1333,7 +1345,7 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 
 **Cause:** The assistant wrote from memory against a library version it couldn't compile against, and the first "fix" was often another guess.
 
-**Fix:** Paste the exact error (Pattern Z2), and ask the assistant to read the library source for the pinned version before fixing. That's what finally fixed the `using` error in `qdvc-countdowns-android`.
+**Fix:** Paste the exact error (Pattern Z2), and ask the assistant to read the library source for the pinned version before fixing. That's what finally fixed the `using` error in `qdvc-countdowns-android`. The same goes for file formats: read the specification, not just typical samples ([see below](#parser-rules-inferred-from-typical-samples-instead-of-the-formats-definition)).
 
 ### Code it couldn't compile, run or see
 
@@ -1343,7 +1355,7 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 
 **Cause:** The sandbox has no Xcode, Android SDK, .NET SDK or GTK display. Only pure logic (core libraries, parsers) could be tested there.
 
-**Fix:** Push logic out of UI files into testable core modules (as the Swift apps' cores and `qdvc-checklists-android`'s `util` did). Collect all errors in one go with `… 2>&1 | grep -E "error:" | sort -u`. Expect the commit message to state what remains unverified.
+**Fix:** Push logic out of UI files into testable core modules (as the Swift apps' cores and `qdvc-checklists-android`'s `util` did). Collect all errors in one go with `… 2>&1 | grep -E "error:" | sort -u`. Expect the commit message to state what remains unverified. The opposite problem also happens: a sandbox with a preinstalled scientific stack can hide a missing dependency ([networkx and numpy](#networkx-layouts-need-numpy-which-a-plain-pip-install-networkx-doesnt-install)).
 
 ### Unable to read GitHub
 
@@ -1402,6 +1414,18 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 **Cause:** A `WriteResult.docId` meant "the folder this write touched", which was the checklist for some operations and the new item for others. The caller always treated it as the checklist. Separately, a launch-time snapshot was used as the authority on what exists, and `?: after.firstOrNull()` silently substituted an unrelated checklist when the new one wasn't in it.
 
 **Fix:** Name fields for exactly what they identify. When the current item can't be found, show an empty state rather than another item. The two meanings coincide in the common cases, which is why this kind of bug passes review.
+
+### Parser rules inferred from typical samples instead of the format's definition
+
+Non-public QDVC project (2026-11-25) · [report](reports/processed/2026-11-25-ai-mistakes-parser-rules-from-samples.md)
+
+**Symptom:** An importer for the line-tagged `refer` bibliographic format (`%` + tag letter + value on each line, with EndNote's tagged export adding `%0` for the reference type) split every record of a real, valid file in two. Each title became a record of its own, and the rest of the record, with no title, was skipped as invalid. The file's records began `%T <title>` followed by `%0 <reference type>`.
+
+**Cause:** Confirmed by reproducing with the file and reading the parser. The assistant had added a rule that every `%0` line starts a new record, because most exporters write `%0` first, to cope with hypothetical files that run records together. No specification says that: classic `refer` (the groff `refer(1)` manual page) separates records with blank lines and says nothing about field order, EndNote's import-filter documentation lets the type tag appear anywhere, and bibutils also splits on blank lines. The assistant's own test file was written in the assumed shape, so the tests checked the assumption rather than the format, and it never asked for a real sample. The same session joined repeated single-valued tags, guessing at wrapped values, where the manual says a later occurrence replaces the earlier one (except `%A` and `%E`).
+
+**Fix:** `%0` now starts a new record only when the current record already has one, and blank lines remain the separator. The owner's real sample (redacted) became a regression test, the invented test file was corrected, and the other departures from the manual were listed for the owner to decide on. Confirmed by the owner.
+
+**Watch for:** When writing a parser, note where each rule comes from. Rules from the specification decide structure (where records begin and end, what's required, what repetition means); patterns seen in samples may only add tolerance where the specification is silent, and must never change how valid input is read. "Most files do X" isn't a rule. A guess that changes how input is divided or merged is a question for the human: say what the specification says, what the samples suggest, and ask for a real file. Don't let invented test data confirm your own assumptions.
 
 ## Sources
 

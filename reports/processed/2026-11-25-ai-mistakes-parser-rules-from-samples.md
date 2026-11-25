@@ -1,3 +1,5 @@
+> **Outcome (2026-11-25):** New entry "Parser rules inferred from typical samples instead of the format's definition" in Mistakes the AI kept repeating; the related "Guessing an API instead of reading its source" entry and the BibTeX entry now link to it.
+
 # Parser rules inferred from typical sample files instead of the format's definition
 
 - **Date encountered:** 2026-11-25

@@ -1,3 +1,5 @@
+> **Outcome (2026-11-25):** New entry "networkx layouts need numpy, which a plain `pip install networkx` doesn't install" in Other libraries and services; the related "Code it couldn't compile, run or see" entry now links to it.
+
 # networkx layout functions fail with "No module named 'numpy'", although networkx installed fine
 
 - **Date encountered:** 2026-11-25
