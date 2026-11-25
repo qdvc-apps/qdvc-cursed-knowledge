@@ -361,7 +361,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-linux
 
 ### oh-my-zsh ignores completions added to `fpath` after it loads
 
-[`qdvc-gtd-eml` UR.53](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-23-conversation-with-claude.md#53-user-request) → [`qdvc-gtd-eml` UR.57](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-23-conversation-with-claude.md#57-user-request)
+[`qdvc-gtd-eml` UR.53](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-23-conversation-with-claude-COMMANDLINE.md#53-user-request) → [`qdvc-gtd-eml` UR.57](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-23-conversation-with-claude-COMMANDLINE.md#57-user-request)
 
 **Symptom:** A custom `_gtd` completion was never used; Tab fell back to filename completion.
 
@@ -371,7 +371,7 @@ Non-public QDVC project (2026-11) · [report](reports/processed/2026-11-01-linux
 
 ### Colours vanish when piping to `less -R`
 
-[`qdvc-gtd-eml` UR.29](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-23-conversation-with-claude.md#29-user-request)
+[`qdvc-gtd-eml` UR.29](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-23-conversation-with-claude-COMMANDLINE.md#29-user-request)
 
 **Symptom:** `gtd.py | less -R` showed no colour.
 
@@ -477,7 +477,7 @@ fatal: Need to specify how to reconcile divergent branches.
 
 ### `HSplitView` ignores SwiftUI's safe area
 
-[`qdvc-gtd-eml-mac` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml-mac/blob/8f210e1e48dbcb84d4929f3ebe876fefde3f4064/ai-assistance-logs/2026-09-30-claude.md#9-user-request) · [`qdvc-gtd-eml-mac` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml-mac/blob/8f210e1e48dbcb84d4929f3ebe876fefde3f4064/ai-assistance-logs/2026-10-21-claude.md#9-user-request)
+[`qdvc-gtd-eml` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-09-30-claude-MAC.md#9-user-request) · [`qdvc-gtd-eml` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-10-21-claude-MAC.md#9-user-request)
 
 **Symptom:** A notification banner covered the message list's title. Later, the window tab bar cut across the list and reading pane but looked fine in single-message tabs.
 
@@ -487,7 +487,7 @@ fatal: Need to specify how to reconcile divergent branches.
 
 ### A `WindowGroup` always adds a `+` button to the tab bar
 
-[`qdvc-gtd-eml-mac` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml-mac/blob/8f210e1e48dbcb84d4929f3ebe876fefde3f4064/ai-assistance-logs/2026-10-21-claude.md#9-user-request)
+[`qdvc-gtd-eml` UR.9](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-10-21-claude-MAC.md#9-user-request)
 
 **Symptom:** Message windows opened as tabs showed a meaningless `+` button, flashed as a separate window when opened, and came back at launch.
 
@@ -559,7 +559,7 @@ fatal: Need to specify how to reconcile divergent branches.
 
 ### Main-actor isolation errors in a toolbar builder struct
 
-[`qdvc-gtd-eml-mac` UR.7](https://github.com/qdvc-apps/qdvc-gtd-eml-mac/blob/8f210e1e48dbcb84d4929f3ebe876fefde3f4064/ai-assistance-logs/2026-09-30-claude.md#7-user-request)
+[`qdvc-gtd-eml` UR.7](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-09-30-claude-MAC.md#7-user-request)
 
 **Symptom:** `main actor-isolated property 'selectedRecords' can not be referenced from a nonisolated context`.
 
@@ -1115,19 +1115,19 @@ Non-public QDVC project (2026-11-19) · [report](reports/processed/2026-11-19-ne
 
 ### Plotly Sankey labels look "ghosted"
 
-[`qdvc-gtd-eml` UR.11](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-07-03-claude.md#11-user-request) → [`qdvc-gtd-eml` UR.17](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-07-03-claude.md#17-user-request)
+[`qdvc-gtd-eml` UR.11](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-07-03-claude-COMMANDLINE.md#11-user-request) → [`qdvc-gtd-eml` UR.17](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-07-03-claude-COMMANDLINE.md#17-user-request)
 
 **Symptom:** In Plotly 3.7.0 on Chromium, Sankey node labels looked as though they were drawn several times over.
 
 **Cause:** Plotly applies an inline `style` on each label's `<text>` element with a four-way `text-shadow` halo (four dark offset copies, which read as ghosting). Two earlier theories were wrong: `responsive: true` accumulating text nodes, and draggable nodes maintaining a second layer (making the Sankey `arrangement: "fixed"` removed dragging and fixed nothing). A CSS rule aimed at `.text-shadow` didn't match because in this version the element's class is `node-label`.
 
-**Fix:** `text.node-label { text-shadow: none !important; }`. `!important` is what lets a stylesheet rule beat an inline style. Confirmed fixed in [`qdvc-gtd-eml` UR.19](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-07-03-claude.md#19-user-request).
+**Fix:** `text.node-label { text-shadow: none !important; }`. `!important` is what lets a stylesheet rule beat an inline style. Confirmed fixed in [`qdvc-gtd-eml` UR.19](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-07-03-claude-COMMANDLINE.md#19-user-request).
 
 **Watch for:** Ask for the browser inspector's rendered element early. It settled in one round what three rounds of theory hadn't.
 
 ### Inlined JSON can close your `<script>` tag
 
-[`qdvc-gtd-eml` UR.5](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-08-05-claude.md#5-user-request)
+[`qdvc-gtd-eml` UR.5](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-08-05-claude-COMMANDLINE.md#5-user-request)
 
 **Symptom:** (Caught during hardening.) An email body containing `</script>` ended up verbatim in the generated `mail.js`.
 
@@ -1289,7 +1289,7 @@ Non-public QDVC project (2026-11-25) · [report](reports/processed/2026-11-25-ot
 
 ### Email: headers, bodies and encodings
 
-[`qdvc-gtd-eml` UR.19](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-23-conversation-with-claude.md#19-user-request) · [`qdvc-nice-mail-windows` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#3-user-request)
+[`qdvc-gtd-eml` UR.19](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-23-conversation-with-claude-COMMANDLINE.md#19-user-request) · [`qdvc-nice-mail-windows` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#3-user-request)
 
 **Symptom:** (Several near misses.) Searching message bodies for a reference, and generating `.eml` files in three ports.
 
@@ -1299,7 +1299,7 @@ Non-public QDVC project (2026-11-25) · [report](reports/processed/2026-11-25-ot
 
 ### Markdown piped to `glow` interprets the email body
 
-[`qdvc-gtd-eml` UR.17](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-23-conversation-with-claude.md#17-user-request)
+[`qdvc-gtd-eml` UR.17](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-23-conversation-with-claude-COMMANDLINE.md#17-user-request)
 
 **Symptom:** (Flagged.) A preview tool's output rendered nicely in `glow`, but bodies containing lines starting with `#`, `*` or `-` would be formatted as Markdown.
 
@@ -1329,7 +1329,7 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 
 ### Brace expansion and process substitution in `sh`
 
-[`qdvc-gtd-eml-mac` UR.11](https://github.com/qdvc-apps/qdvc-gtd-eml-mac/blob/8f210e1e48dbcb84d4929f3ebe876fefde3f4064/ai-assistance-logs/2026-09-30-claude.md#11-user-request) · [`qdvc-nice-mail-windows` UR.5](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#5-user-request) · [`qdvc-nice-mail-mac` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-mac/blob/8218ffc10b9c2d5e4f4f8260cecf155a2e105547/ai-assistance-logs/2026-09-30-claude.md#3-user-request) · [`qdvc-progress-gtk4` UR.1](https://github.com/qdvc-apps/qdvc-progress-gtk4/blob/52abc25fb53a95a259e7d0c0e719d559053bdee6/ai-assistance-logs/2026-10-14-claude.md#1-user-request)
+[`qdvc-gtd-eml` UR.11](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-09-30-claude-MAC.md#11-user-request) · [`qdvc-nice-mail-windows` UR.5](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#5-user-request) · [`qdvc-nice-mail-mac` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-mac/blob/8218ffc10b9c2d5e4f4f8260cecf155a2e105547/ai-assistance-logs/2026-09-30-claude.md#3-user-request) · [`qdvc-progress-gtk4` UR.1](https://github.com/qdvc-apps/qdvc-progress-gtk4/blob/52abc25fb53a95a259e7d0c0e719d559053bdee6/ai-assistance-logs/2026-10-14-claude.md#1-user-request)
 
 **Symptom:** A stray folder literally named `{docs,tools,scripts,Resources,sample-workspace,Sources` (and deeper variants such as `{Model,UI,Resources},tests`) committed alongside the real project tree.
 
@@ -1359,7 +1359,7 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 
 ### Unable to read GitHub
 
-[`qdvc-gtd-eml` UR.3](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-06-24-conversation-with-claude.md#3-user-request) · [`qdvc-nice-mail` UR.13](https://github.com/qdvc-apps/qdvc-nice-mail/blob/b7119f3ba6fe2c28101819b42af81a96173ba530/vibe-coding/2026-07-13-claude.md#13-user-request) · [`qdvc-nice-mail-windows` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#3-user-request)
+[`qdvc-gtd-eml` UR.3](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-06-24-conversation-with-claude-COMMANDLINE.md#3-user-request) · [`qdvc-nice-mail` UR.13](https://github.com/qdvc-apps/qdvc-nice-mail/blob/b7119f3ba6fe2c28101819b42af81a96173ba530/vibe-coding/2026-07-13-claude.md#13-user-request) · [`qdvc-nice-mail-windows` UR.3](https://github.com/qdvc-apps/qdvc-nice-mail-windows/blob/05e28c0e2aa5ed9baf3d28172082169e8442ab9a/ai-assistance-logs/2026-09-28-claude.md#3-user-request)
 
 **Symptom:** "API is rate-limited", "the repo blocks automated access", or (in the Windows port) a whole app rebuilt from the README because the source files couldn't be fetched.
 
@@ -1379,7 +1379,7 @@ These aren't platform bugs, but they cost real rounds in more than one project a
 
 ### Theorising for rounds instead of measuring
 
-[`qdvc-tadaima` UR.33](https://github.com/qdvc-apps/qdvc-tadaima/blob/14219673b2454a4847a001ba9493ea8170de7f24/vibe-coding/2026-07-25-claude.md#33-user-request) · [`qdvc-gtd-eml` UR.13](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/6d1830abdb77370bc7962e6db6f9f19debecc41c/vibe-coding/2026-07-03-claude.md#13-user-request) · [`qdvc-empirics` UR.10](https://github.com/qdvc-apps/qdvc-empirics/blob/1cbefda7dde360b33c70c014d7e7a8998d5eb149/ai-assistance-logs/2026-11-11-claude-1.md#10-user-request)
+[`qdvc-tadaima` UR.33](https://github.com/qdvc-apps/qdvc-tadaima/blob/14219673b2454a4847a001ba9493ea8170de7f24/vibe-coding/2026-07-25-claude.md#33-user-request) · [`qdvc-gtd-eml` UR.13](https://github.com/qdvc-apps/qdvc-gtd-eml/blob/50d35b97ad5a59223d96d93e02f25fe98447ff58/ai-assistance-logs/2026-07-03-claude-COMMANDLINE.md#13-user-request) · [`qdvc-empirics` UR.10](https://github.com/qdvc-apps/qdvc-empirics/blob/1cbefda7dde360b33c70c014d7e7a8998d5eb149/ai-assistance-logs/2026-11-11-claude-1.md#10-user-request)
 
 **Symptom:** About 12 rounds on the Tadaima CPU spin, four on the Plotly ghosting, five on the Empirics sidebar, and five on Tadaima's thumbnail grid. Each round brought a new confident explanation.
 
@@ -1429,7 +1429,7 @@ Non-public QDVC project (2026-11-25) · [report](reports/processed/2026-11-25-ai
 
 ## Sources
 
-Logs from these repositories were read for this document (as at 19 November 2026): `.github`, `clock`, `focus`, `hernantz-timezones`, `qdvc-android-app-specification`, `qdvc-apa-citations-check`, `qdvc-articulate`, `qdvc-autolitreview-tester`, `qdvc-bibliotheca`, `qdvc-bibliotheca-mac`, `qdvc-case-manager`, `qdvc-cat-android`, `qdvc-checklist-studio`, `qdvc-checklists-android`, `qdvc-citations-checker-mac`, `qdvc-countdowns`, `qdvc-countdowns-android`, `qdvc-csv-android`, `qdvc-datesetter`, `qdvc-display-toggle`, `qdvc-empirics`, `qdvc-equip`, `qdvc-family-noticeboard`, `qdvc-gioia-diagram`, `qdvc-gtd-eml`, `qdvc-gtd-eml-gtk4`, `qdvc-gtd-eml-mac`, `qdvc-health-dashboard`, `qdvc-household-records`, `qdvc-html-to-markdown-SPA`, `qdvc-logbook`, `qdvc-manuscript`, `qdvc-markdown-notebook`, `qdvc-markdown-notebook-android`, `qdvc-markdownpedia`, `qdvc-meetings`, `qdvc-nice-mail`, `qdvc-nice-mail-mac`, `qdvc-nice-mail-windows`, `qdvc-nts-android`, `qdvc-offgrid-buddies`, `qdvc-paperpod-suite`, `qdvc-podcaster`, `qdvc-progress-gtk4`, `qdvc-progress-mac`, `qdvc-python-gtk-app-specification`, `qdvc-quickprisma`, `qdvc-research-pipeline`, `qdvc-response-letter-mac`, `qdvc-super-switcher`, `qdvc-tadaima`, `stickies` and `test-management`.
+Logs from these repositories were read for this document (as at 19 November 2026): `.github`, `clock`, `focus`, `hernantz-timezones`, `qdvc-android-app-specification`, `qdvc-apa-citations-check`, `qdvc-articulate`, `qdvc-autolitreview-tester`, `qdvc-bibliotheca`, `qdvc-bibliotheca-mac`, `qdvc-case-manager`, `qdvc-cat-android`, `qdvc-checklist-studio`, `qdvc-checklists-android`, `qdvc-citations-checker-mac`, `qdvc-countdowns`, `qdvc-countdowns-android`, `qdvc-csv-android`, `qdvc-datesetter`, `qdvc-display-toggle`, `qdvc-empirics`, `qdvc-equip`, `qdvc-family-noticeboard`, `qdvc-gioia-diagram`, `qdvc-gtd-eml` (since November 2026 a monorepo that also contains the former `qdvc-gtd-eml-gtk4` and `qdvc-gtd-eml-mac`), `qdvc-health-dashboard`, `qdvc-household-records`, `qdvc-html-to-markdown-SPA`, `qdvc-logbook`, `qdvc-manuscript`, `qdvc-markdown-notebook`, `qdvc-markdown-notebook-android`, `qdvc-markdownpedia`, `qdvc-meetings`, `qdvc-nice-mail`, `qdvc-nice-mail-mac`, `qdvc-nice-mail-windows`, `qdvc-nts-android`, `qdvc-offgrid-buddies`, `qdvc-paperpod-suite`, `qdvc-podcaster`, `qdvc-progress-gtk4`, `qdvc-progress-mac`, `qdvc-python-gtk-app-specification`, `qdvc-quickprisma`, `qdvc-research-pipeline`, `qdvc-response-letter-mac`, `qdvc-super-switcher`, `qdvc-tadaima`, `stickies` and `test-management`.
 
 `qdvc-offgrid-bot`, `qdvc-project-cards` and `qdvc-tidy-transcript` had no logs at the time.
 
